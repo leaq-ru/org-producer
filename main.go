@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/nnqq/scr-org-reindex/config"
-	"github.com/nnqq/scr-org-reindex/healthz"
-	"github.com/nnqq/scr-org-reindex/logger"
-	"github.com/nnqq/scr-org-reindex/mongo"
-	"github.com/nnqq/scr-org-reindex/reindex"
+	"github.com/nnqq/scr-org-producer/config"
+	"github.com/nnqq/scr-org-producer/healthz"
+	"github.com/nnqq/scr-org-producer/logger"
+	"github.com/nnqq/scr-org-producer/mongo"
+	"github.com/nnqq/scr-org-producer/reindex"
 	"log"
 )
 

@@ -1,4 +1,4 @@
-module github.com/nnqq/scr-org-reindex
+module github.com/nnqq/scr-org-producer
 
 go 1.15
 
