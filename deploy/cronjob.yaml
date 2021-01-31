@@ -1,0 +1,57 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: org-reindex
+  labels:
+    app: org-reindex
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "0 1 15 */4 *"
+  jobTemplate:
+    metadata:
+      labels:
+        app: org-reindex
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: ghcr
+          containers:
+            - name: org-reindex
+              image: busybox
+              command:
+                - /app/servicebin
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 80
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 80
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 100Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+              env:
+                - name: HTTP_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: port
+                      name: http
+                - name: STAN_CLUSTERID
+                  valueFrom:
+                    configMapKeyRef:
+                      key: clusterid
+                      name: stan
+                - name: NATS_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: url
+                      name: nats
+                - name: LOGLEVEL
+                  value: error
