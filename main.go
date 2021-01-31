@@ -5,8 +5,8 @@ import (
 	"github.com/nnqq/scr-org-producer/config"
 	"github.com/nnqq/scr-org-producer/healthz"
 	"github.com/nnqq/scr-org-producer/logger"
-	"github.com/nnqq/scr-org-producer/mongo"
-	"github.com/nnqq/scr-org-producer/reindex"
+	"github.com/nnqq/scr-org-producer/producer"
+	"github.com/nnqq/scr-org-producer/stan"
 	"log"
 )
 
@@ -23,15 +23,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := mongo.NewConn(ctx, cfg.MongoDB.URL)
-	logg.Must(err)
-
-	orgClient, err := call.NewClients(cfg.Service.Org)
+	sc, err := stan.NewConn(cfg.ServiceName, cfg.STAN.ClusterID, cfg.NATS.URL)
 	logg.Must(err)
 
 	go func() {
 		logg.Must(healthz.NewHealthz(logg.ZL, cfg.HTTP.Port).Serve())
 	}()
 
-	logg.Must(reindex.NewReindex(logg.ZL, orgClient).Do(ctx))
+	logg.Must(producer.NewProducer(logg.ZL, sc).Do(ctx))
 }

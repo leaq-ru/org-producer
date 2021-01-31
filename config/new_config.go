@@ -4,5 +4,6 @@ import "github.com/kelseyhightower/envconfig"
 
 func NewConfig() (cfg Config, err error) {
 	err = envconfig.Process("", &cfg)
+	cfg.ServiceName = "org-producer"
 	return
 }
