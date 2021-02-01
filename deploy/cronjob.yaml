@@ -32,8 +32,8 @@ spec:
                   port: 80
               resources:
                 requests:
-                  cpu: 100m
-                  memory: 100Mi
+                  cpu: 50m
+                  memory: 50Mi
                 limits:
                   cpu: "1"
                   memory: 1Gi
@@ -53,5 +53,10 @@ spec:
                     configMapKeyRef:
                       key: url
                       name: nats
+                - name: MONGODB_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: url
+                      name: mongodb
                 - name: LOGLEVEL
-                  value: error
+                  value: debug

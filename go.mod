@@ -10,5 +10,6 @@ require (
 	github.com/nats-io/nats-streaming-server v0.20.0 // indirect
 	github.com/nats-io/stan.go v0.8.2
 	github.com/rs/zerolog v1.20.0
+	go.mongodb.org/mongo-driver v1.4.5
 	google.golang.org/protobuf v1.25.0 // indirect
 )

@@ -16,10 +16,12 @@ import (
 )
 
 func (p Producer) Do(ctx context.Context) error {
+	p.logger.Debug().Msg("get nalog.ru HTML start...")
 	res, err := http.Get("https://www.nalog.ru/opendata/7707329152-rsmp/")
 	if err != nil {
 		return err
 	}
+	p.logger.Debug().Msg("get nalog.ru HTML done")
 	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -28,29 +30,34 @@ func (p Producer) Do(ctx context.Context) error {
 	}
 
 	var dlLink string
-	for _, node := range doc.Find("td").Nodes {
-		if node.Data == "Гиперссылка (URL) на набор" {
-			for _, attr := range node.NextSibling.FirstChild.Attr {
-				if attr.Key == "href" {
-					dlLink = attr.Val
-					break
-				}
+	doc.Find("td").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+		if s.Text() == "Гиперссылка (URL) на набор" {
+			attr, ok := s.Next().Children().Attr("href")
+			if ok && attr != "" {
+				dlLink = attr
+				return false
 			}
 		}
-	}
+		return true
+	})
 
 	if dlLink == "" {
-		return errors.New("xml download link not found")
+		return errors.New("zip download link not found")
 	}
 
+	p.logger.Debug().Str("dlLink", dlLink).Msg("got zip download url")
+
+	p.logger.Debug().Msg("get zip reader start...")
 	resZipXml, err := http.Get(dlLink)
 	if err != nil {
 		return err
 	}
+	p.logger.Debug().Msg("get zip reader done")
 	defer resZipXml.Body.Close()
 
 	const filename = "archive.zip"
 
+	p.logger.Debug().Msg("loading zip to file start...")
 	outFile, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -61,21 +68,45 @@ func (p Producer) Do(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	p.logger.Debug().Msg("loading zip to file done")
 
+	p.logger.Debug().Msg("zip.OpenReader start...")
 	reader, err := zip.OpenReader(filename)
 	if err != nil {
 		return err
 	}
+	p.logger.Debug().Msg("zip.OpenReader done")
 
 	totalProduced := 0
 	go func() {
-		for ctx.Err() != nil {
+		for ctx.Err() == nil {
 			p.logger.Debug().Int("totalProduced", totalProduced).Send()
 			time.Sleep(10 * time.Second)
 		}
 	}()
 
-	for _, f := range reader.File {
+	lastLoopIndex, err := p.stateModel.GetLastLoopIndex(ctx)
+	if err != nil {
+		return err
+	}
+	p.logger.Debug().Uint32("lastLoopIndex", lastLoopIndex).Msg("value from GetLastLoopIndex")
+
+	go func() {
+		for ctx.Err() == nil {
+			e := p.stateModel.Commit(ctx, lastLoopIndex)
+			if e != nil {
+				p.logger.Error().Err(e).Send()
+			}
+			time.Sleep(time.Second)
+		}
+	}()
+
+	lastIndex := lastLoopIndex
+	if len(reader.File) < int(lastLoopIndex) {
+		lastIndex = uint32(len(reader.File))
+	}
+
+	for i, f := range reader.File[lastIndex:] {
 		xmlItem, errOpen := f.Open()
 		if errOpen != nil {
 			return errOpen
@@ -127,6 +158,7 @@ func (p Producer) Do(ctx context.Context) error {
 				return errPublish
 			}
 			totalProduced += 1
+			lastLoopIndex = uint32(i)
 		}
 	}
 	return nil
