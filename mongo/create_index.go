@@ -16,7 +16,7 @@ func createIndex(db *mongo.Database) (err error) {
 			Key:   "u",
 			Value: 1,
 		}},
-		Options: options.Index().SetExpireAfterSeconds(int32(time.Hour.Seconds())),
+		Options: options.Index().SetExpireAfterSeconds(int32((72 * time.Hour).Seconds())),
 	})
 	return
 }
