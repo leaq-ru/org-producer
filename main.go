@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/nnqq/scr-org-producer/config"
-	"github.com/nnqq/scr-org-producer/healthz"
-	"github.com/nnqq/scr-org-producer/logger"
-	"github.com/nnqq/scr-org-producer/mongo"
-	"github.com/nnqq/scr-org-producer/producer"
-	"github.com/nnqq/scr-org-producer/stan"
-	"github.com/nnqq/scr-org-producer/state"
+	"github.com/leaq-ru/org-producer/config"
+	"github.com/leaq-ru/org-producer/healthz"
+	"github.com/leaq-ru/org-producer/logger"
+	"github.com/leaq-ru/org-producer/mongo"
+	"github.com/leaq-ru/org-producer/producer"
+	"github.com/leaq-ru/org-producer/stan"
+	"github.com/leaq-ru/org-producer/state"
 	"log"
 )
 

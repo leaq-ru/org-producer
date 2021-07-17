@@ -1,8 +1,8 @@
 package producer
 
 import (
+	"github.com/leaq-ru/org-producer/state"
 	"github.com/nats-io/stan.go"
-	"github.com/nnqq/scr-org-producer/state"
 	"github.com/rs/zerolog"
 )
 

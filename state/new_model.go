@@ -1,7 +1,7 @@
 package state
 
 import (
-	"github.com/nnqq/scr-org-producer/mongo"
+	"github.com/leaq-ru/org-producer/mongo"
 	md "go.mongodb.org/mongo-driver/mongo"
 )
 

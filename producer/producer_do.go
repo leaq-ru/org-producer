@@ -7,7 +7,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/nnqq/scr-org-producer/protocol"
+	"github.com/leaq-ru/org-producer/protocol"
 	"io"
 	"io/ioutil"
 	"net/http"

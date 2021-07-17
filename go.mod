@@ -1,4 +1,4 @@
-module github.com/nnqq/scr-org-producer
+module github.com/leaq-ru/org-producer
 
 go 1.15
 
