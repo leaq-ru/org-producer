@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -34,7 +35,7 @@ func (p Producer) Do(ctx context.Context) error {
 		if s.Text() == "Гиперссылка (URL) на набор" {
 			attr, ok := s.Next().Children().Attr("href")
 			if ok && attr != "" {
-				dlLink = attr
+				dlLink = strings.TrimSpace(attr)
 				return false
 			}
 		}
